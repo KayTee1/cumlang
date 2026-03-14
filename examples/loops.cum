@@ -1,0 +1,14 @@
+shaft main(){
+    shaft x = 5;
+
+    keep_pumping(x < 10){
+        spit("x value %d\n", x);
+        x += 1;
+    } 
+
+    stroke(shaft i=0; i<3; i++){
+        spit("loop %d\n", i);
+    }
+
+    nut 0;
+}
