@@ -2,7 +2,10 @@
 
 import sys
 import subprocess
+import tempfile
 from pathlib import Path
+import re
+
 
 REPLACEMENTS = {
     "shaft": "int",
@@ -16,13 +19,18 @@ REPLACEMENTS = {
     "limp": "else"
 }
 
-def main():
+def replace_keywords(source_code: str)->str:
+    for sus_word, c_word in REPLACEMENTS.items():
+        source_code = re.sub(rf"\b{re.escape(sus_word)}\b", c_word, source_code)
+    return source_code
 
+
+def main():
     if len(sys.argv) != 2:
         print("usage: fuck <file.cum>")
         sys.exit(1)
 
-    source_path = Path(sys.argv[1])
+    source_path = Path(sys.argv[1]).resolve()
 
     if not source_path.exists():
         print(f"error: file not found: {source_path}")
@@ -33,35 +41,29 @@ def main():
         sys.exit(1)
 
     source_code = source_path.read_text()
-
-    c_code = source_code
-    for sus_word, c_word in REPLACEMENTS.items():
-        c_code = c_code.replace(sus_word, c_word)
-
+    c_code = replace_keywords(source_code)
     c_code = "#include <stdio.h>\n\n" + c_code
 
-    build_dir = Path("build")
-    build_dir.mkdir(exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="cumlang-") as tmpdir:
+        tmpdir = Path(tmpdir)
+        c_file = tmpdir / f"{source_path.stem}.c"
+        exe_file = tmpdir / source_path.stem
 
-    c_file = build_dir / "out.c"
-    exe_file = build_dir / "out"
+        c_file.write_text(c_code)
 
-    c_file.write_text(c_code)
+        compile_result = subprocess.run(
+            ["gcc", str(c_file), "-o", str(exe_file)],
+            capture_output=True,
+            text=True, 
+        )
     
-    compile_results = subprocess.run(
-        ["gcc", str(c_file), "-o", str(exe_file)],
-        capture_output=True,
-        text=True,
-    )
-    
-    if compile_results.returncode != 0:
-        print("Compilation failed: insufficient thrust")
-        print(compile_results.stderr)
-        sys.exit(1)
+        if compile_result.returncode != 0:
+            print("Compilation failed: insufficient thrust")
+            print(compile_results.stderr)
+            sys.exit(1)
 
-    run_result = subprocess.run([str(exe_file)])
-
-    sys.exit(run_result.returncode)
+        run_result = subprocess.run([str(exe_file)])
+        sys.exit(run_result.returncode)
 
 if __name__ == "__main__":
     main()
