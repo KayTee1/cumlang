@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+
+import sys
+import subprocess
+from pathlib import Path
+
+REPLACEMENTS = {
+  "shaft": "int",
+  "balls": "double",
+  "edge": "void",
+  "nut": "return",
+  "spit": "printf",
+  "keep_pumping":,
+  "stroke": "for",
+  "horny": "if",
+  "limp": "else"
+}
+
+def main():
+
+    if len(sys.argv) != 2:
+        print("usage: fuck <file.cum>")
+        sys.exit(1)
+
+    source_path = Path(sys.argv[1])
+
+    if not source_path.exists():
+        print(f"error: file not found: {source_path}")
+        sys.exit(1)
+
+    if source_path.suffic != ".cum":
+        print("error: source file must use .cum extension")
+        sys.exit(1)
+
+    source_code = source_path.read_text()
+
+    c_code = source_code
+    for sus_word, c_word in REPLACEMENTS.items():
+        c_code = c_code.replace(sus_word, c_word)
+
+    c_code = "#include <stdio.h>\n\n" + c_code
+
+    build_dir = Path("build")
+    build_dir.mkdir(exist_ok=True)
+
+    c_file = build_dir / "out.c"
+    exe_file = build_dir / "out"
+
+    c_file.write_text(c_code)
+    
+    compile_results = subprocess.run(
+        ["gcc", str(c_file), "-o", str(exe_file)],
+        capture_output=True,
+        text=True,
+    )
+    
+    if compile_results.returncode != 0:
+        print("Compilation failed: insufficient thrust")
+        print(compile_results.stderr)
+        sys.exit(1)
+
+    run_result = subprocess.run([str(exe_file)])
+
+    sys.exit(run_result.returncode)
+
+if __name__ == "__main__":
+    main()
+    
