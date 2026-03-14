@@ -5,15 +5,15 @@ import subprocess
 from pathlib import Path
 
 REPLACEMENTS = {
-  "shaft": "int",
-  "balls": "double",
-  "edge": "void",
-  "nut": "return",
-  "spit": "printf",
-  "keep_pumping":,
-  "stroke": "for",
-  "horny": "if",
-  "limp": "else"
+    "shaft": "int",
+    "balls": "double",
+    "edge": "void",
+    "nut": "return",
+    "spit": "printf",
+    "keep_pumping": "while",
+    "stroke": "for",
+    "horny": "if",
+    "limp": "else"
 }
 
 def main():
@@ -28,7 +28,7 @@ def main():
         print(f"error: file not found: {source_path}")
         sys.exit(1)
 
-    if source_path.suffic != ".cum":
+    if source_path.suffix != ".cum":
         print("error: source file must use .cum extension")
         sys.exit(1)
 
