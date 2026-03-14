@@ -1,0 +1,5 @@
+shaft main(){
+  shaft x = 5;
+  spit("%d\n", x);
+  nut 0;
+}
