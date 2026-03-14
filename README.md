@@ -6,11 +6,34 @@ This project explores how programming languages actually work under the hood by 
 
 The goal of the project is to demystify compiler construction by building a language from scratch while keeping the process entertaining.
 
+## example
 
-## v0 - cursed keyword translator
+main.cum
+```
+shaft main(){
+    stroke(shaft i=3;i<3;i++){
+        spit("i at %d\n", i);
+    }
+
+    nut 0;
+}
+```
+
+executing ```fuck main.cum```
+
+output:
+```
+i at 0
+i at 1 
+i at 2
+```
+
+## versioning
+
+### v0 - cursed keyword translator
 - .cum source files
 - working fuck command
-- keyword translation to > C
+- keyword translation to C
 - compilation through gcc
 - temporary build files handling
 
