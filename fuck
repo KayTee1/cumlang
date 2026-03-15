@@ -1,28 +1,13 @@
 #!/usr/bin/env python3
 
 import sys
-import subprocess
-import tempfile
 from pathlib import Path
-import re
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+SRC_DIR = SCRIPT_DIR / "src"
+sys.path.insert(0, str(SRC_DIR))
 
-REPLACEMENTS = {
-    "shaft": "int",
-    "balls": "double",
-    "edge": "void",
-    "nut": "return",
-    "spit": "printf",
-    "keep_pumping": "while",
-    "stroke": "for",
-    "horny": "if",
-    "limp": "else"
-}
-
-def replace_keywords(source_code: str)->str:
-    for sus_word, c_word in REPLACEMENTS.items():
-        source_code = re.sub(rf"\b{re.escape(sus_word)}\b", c_word, source_code)
-    return source_code
+from lexer import lex
 
 
 def main():
@@ -41,29 +26,16 @@ def main():
         sys.exit(1)
 
     source_code = source_path.read_text()
-    c_code = replace_keywords(source_code)
-    c_code = "#include <stdio.h>\n\n" + c_code
 
-    with tempfile.TemporaryDirectory(prefix="cumlang-") as tmpdir:
-        tmpdir = Path(tmpdir)
-        c_file = tmpdir / f"{source_path.stem}.c"
-        exe_file = tmpdir / source_path.stem
+    try:
+        tokens = lex(source_code)
+    except ValueError as error:
+        print(f"Lexing failed: {error}")
+        sys.exit(1)
 
-        c_file.write_text(c_code)
+    for token in tokens:
+        print(token)
 
-        compile_result = subprocess.run(
-            ["gcc", str(c_file), "-o", str(exe_file)],
-            capture_output=True,
-            text=True, 
-        )
-    
-        if compile_result.returncode != 0:
-            print("Compilation failed: insufficient thrust")
-            print(compile_results.stderr)
-            sys.exit(1)
-
-        run_result = subprocess.run([str(exe_file)])
-        sys.exit(run_result.returncode)
 
 if __name__ == "__main__":
     main()
