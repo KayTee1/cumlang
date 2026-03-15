@@ -37,4 +37,4 @@ i at 2
 - compilation through gcc
 - temporary build files handling
 
-
+### v1 - lexer, tokens
