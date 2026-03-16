@@ -1,11 +1,24 @@
 from dataclasses import dataclass
 from keywords import KEYWORDS
 
+
 @dataclass
 class Token:
     type: str
     value: str
     position: int
+
+
+MULTI_CHAR_TOKENS = {
+    "==": "EQEQ",
+    "!=": "NOTEQ",
+    "<=": "LTE",
+    ">=": "GTE",
+    "+=": "PLUSEQ",
+    "-=": "MINUSEQ",
+    "++": "PLUSPLUS",
+    "--": "MINUSMINUS",
+}
 
 SINGLE_CHAR_TOKENS = {
     "(": "LPAREN",
@@ -15,11 +28,17 @@ SINGLE_CHAR_TOKENS = {
     ";": "SEMICOLON",
     ",": "COMMA",
     "=": "EQUALS",
+    "<": "LT",
+    ">": "GT",
+    "+": "PLUS",
+    "-": "MINUS",
+    "*": "STAR",
+    "/": "SLASH",
 }
 
 
-def lex(source: str)-> list[Token]:
-    tokens:list[Token] = []
+def lex(source: str) -> list[Token]:
+    tokens: list[Token] = []
     i = 0
 
     while i < len(source):
@@ -28,6 +47,13 @@ def lex(source: str)-> list[Token]:
         if char.isspace():
             i += 1
             continue
+
+        if i + 1 < len(source):
+            two_char = source[i:i + 2]
+            if two_char in MULTI_CHAR_TOKENS:
+                tokens.append(Token(MULTI_CHAR_TOKENS[two_char], two_char, i))
+                i += 2
+                continue
 
         if char in SINGLE_CHAR_TOKENS:
             tokens.append(Token(SINGLE_CHAR_TOKENS[char], char, i))
@@ -45,7 +71,7 @@ def lex(source: str)-> list[Token]:
             continue
 
         if char.isdigit():
-            start = i 
+            start = i
             has_dot = False
 
             while i < len(source) and (source[i].isdigit() or source[i] == "."):
@@ -53,7 +79,6 @@ def lex(source: str)-> list[Token]:
                     if has_dot:
                         raise ValueError(f"Invalid number at position {i}")
                     has_dot = True
-
                 i += 1
 
             value = source[start:i]
@@ -61,7 +86,7 @@ def lex(source: str)-> list[Token]:
             continue
 
         if char == '"':
-            start = i 
+            start = i
             i += 1
 
             while i < len(source) and source[i] != '"':
@@ -82,6 +107,3 @@ def lex(source: str)-> list[Token]:
 
     tokens.append(Token("EOF", "", len(source)))
     return tokens
-
-
-
